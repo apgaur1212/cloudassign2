@@ -1,3 +1,4 @@
-Flask
-pyodbc
+flask
 flask-cors
+pyodbc
+azure-storage-blob
