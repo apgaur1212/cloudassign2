@@ -5,7 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app)  # Enable CORS for frontend communication
 
 # Azure SQL Database Configuration
