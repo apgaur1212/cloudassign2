@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
+// Base URL for Azure backend
+const BASE_URL = "https://cloudassign.centralindia-01.azurewebsites.net";
+
 // Styled Components
 const Container = styled.div`
   max-width: 900px;
@@ -78,7 +81,7 @@ function App() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://127.0.0.1:5000/products");
+      const response = await axios.get(`${BASE_URL}/products`);
       setProducts(response.data);
     } catch (error) {
       alert("Error fetching products: " + error.message);
@@ -104,7 +107,7 @@ function App() {
     }
 
     try {
-      await axios.post("http://127.0.0.1:5000/add_product", formDataObj);
+      await axios.post(`${BASE_URL}/add_product`, formDataObj);
       alert("Product added successfully!");
       setFormData({ name: "", description: "", price: "", category: "", image: null });
       fetchProducts(); // Refresh products list immediately
@@ -121,7 +124,7 @@ function App() {
 
     setLoading(true);
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/search?q=${searchQuery}`);
+      const response = await axios.get(`${BASE_URL}/search?q=${searchQuery}`);
       setProducts(response.data);
     } catch (error) {
       alert("Error searching products: " + error.message);
