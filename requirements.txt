@@ -1,4 +1,5 @@
 Flask
 pyodbc
 flask-cors
+azure
 azure-storage-blob
