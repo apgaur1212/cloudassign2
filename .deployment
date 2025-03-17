@@ -1,2 +1,0 @@
-[config]
-COMMAND = bash -c "source antenv/bin/activate && python app.py"
