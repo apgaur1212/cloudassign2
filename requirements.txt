@@ -1,6 +1,8 @@
-Flask
-pyodbc
-flask-cors
+flask
 azure-storage-blob
-azure-identity
-azure-core
+python-dotenv
+openai
+pillow
+pyodbc
+gunicorn
+flask-cors

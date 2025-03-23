@@ -1,1 +1,316 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/logo192.png"/><link rel="manifest" href="/manifest.json"/><title>React App</title><script defer="defer" src="/static/js/main.ed21603e.js"></script><link href="/static/css/main.e6c13ad2.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IItian Adi`s Product Catalogue</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 600px;
+            animation: modalFade 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #4a154b;
+        }
+
+        @keyframes modalFade {
+            from {opacity: 0; transform: translateY(-30px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .action-buttons .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-shopping-cart"></i> Product Catalogue</h1>
+        
+        <!-- Button to open the Add Product modal -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Product List</h2>
+            <div class="action-buttons">
+                <button id="add-product-btn" class="btn"><i class="fas fa-plus-circle"></i> Add New Product</button>
+                <button id="refresh-btn" class="btn btn-secondary"><i class="fas fa-sync-alt"></i> Refresh List</button>
+            </div>
+            <div id="products-container">
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price (INR)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list">
+                        <!-- Products will be dynamically loaded here -->
+                    </tbody>
+                </table>
+                <div id="no-products" class="hidden">No products found. Add your first product above!</div>
+            </div>
+        </div>
+        
+        <!-- Add Product Modal -->
+        <div id="add-product-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="name">Product Name:</label>
+                        <input type="text" id="name" name="name" placeholder="Enter product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (INR):</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Upload Image:</label>
+                        <input type="file" id="image" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-save"></i> Add Product</button>
+                </form>
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+            
+        <!-- Top 5 Characters Section Moved Here -->
+        <!-- <div class="form-group">
+            <label for="manga-name">Enter Manga Name:</label>
+            <input type="text" id="manga-name" name="manga-name" required>
+        </div>
+        <button id="fetch-characters" class="btn">Get Characters</button>
+        <ul id="characters-list"></ul> -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productForm = document.getElementById('product-form');
+            const messageDiv = document.getElementById('message');
+            const productsList = document.getElementById('products-list');
+            const noProductsDiv = document.getElementById('no-products');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const addProductBtn = document.getElementById('add-product-btn');
+            const addProductModal = document.getElementById('add-product-modal');
+            const closeModal = document.querySelector('.close-modal');
+
+            // Load products when page loads
+            loadProducts();
+
+            // Modal controls
+            addProductBtn.addEventListener('click', function() {
+                addProductModal.style.display = 'block';
+            });
+
+            closeModal.addEventListener('click', function() {
+                addProductModal.style.display = 'none';
+                messageDiv.textContent = '';
+                messageDiv.className = 'message';
+                productForm.reset();
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === addProductModal) {
+                    addProductModal.style.display = 'none';
+                    messageDiv.textContent = '';
+                    messageDiv.className = 'message';
+                    productForm.reset();
+                }
+            });
+
+            // Add product form submission
+            if (productForm) {
+                productForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData();
+                    formData.append('name', document.getElementById('name').value);
+                    formData.append('price', document.getElementById('price').value);
+                    formData.append('image', document.getElementById('image').files[0]);
+
+                    // Show loading indication
+                    messageDiv.textContent = 'Adding product...';
+                    messageDiv.className = 'message';
+
+                    fetch('/add_product', {
+                        method: 'POST',
+                        body: formData  
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        messageDiv.textContent = data.message || data.error;
+                        messageDiv.className = data.error ? 'message error' : 'message success';
+
+                        if (!data.error) {
+                            // Only close the modal after successful submission
+                            setTimeout(() => {
+                                addProductModal.style.display = 'none';
+                                productForm.reset();
+                                messageDiv.textContent = '';
+                                messageDiv.className = 'message';
+                            }, 2000);
+                            
+                            loadProducts();
+                        } else {
+                            setTimeout(() => {
+                                messageDiv.textContent = '';
+                                messageDiv.className = 'message';
+                            }, 3000);
+                        }
+                    })
+                    .catch(error => {
+                        messageDiv.textContent = 'Error adding product: ' + error.message;
+                        messageDiv.className = 'message error';
+                        
+                        setTimeout(() => {
+                            messageDiv.textContent = '';
+                            messageDiv.className = 'message';
+                        }, 3000);
+                    });
+                });
+            }
+
+            // Refresh button event
+            refreshBtn.addEventListener('click', loadProducts);
+
+            // Function to load products
+            function loadProducts() {
+                // Show loading indication
+                productsList.innerHTML = '<tr><td colspan="5" style="text-align: center;">Loading products...</td></tr>';
+                
+                fetch('/list_products')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server responded with status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    productsList.innerHTML = '';
+
+                    if (data.products && data.products.length > 0) {
+                        noProductsDiv.classList.add('hidden');
+                        
+                        data.products.forEach(product => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><img src="/get_image/${product.blob_name}" alt="${product.name}" class="product-image"></td>
+                                <td>${product.id}</td>
+                                <td>${product.name}</td>
+                                <td>${product.price.toFixed(2)}</td>
+                                <td>
+                                    <button class="btn btn-danger delete-product" data-id="${product.id}">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </td>
+                            `;
+                            
+                            productsList.appendChild(row);
+                        });
+
+                        // Attach event listeners to delete buttons
+                        document.querySelectorAll(".delete-product").forEach(button => {
+                            button.addEventListener("click", function() {
+                                const productId = this.getAttribute("data-id");
+                                if (confirm("Are you sure you want to delete this product?")) {
+                                    deleteProduct(productId);
+                                }
+                            });
+                        });
+                    } else {
+                        noProductsDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    productsList.innerHTML = '';
+                    noProductsDiv.textContent = 'Error loading products: ' + error.message;
+                    noProductsDiv.classList.remove('hidden');
+                });
+            }
+
+            // Function to delete a product
+            function deleteProduct(productId) {
+                fetch(`/delete_product/${productId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        messageDiv.textContent = data.message;
+                        messageDiv.className = 'message success';
+                        
+                        // Reload products
+                        loadProducts();
+                        
+                        // Clear message after a delay
+                        setTimeout(() => {
+                            messageDiv.textContent = '';
+                            messageDiv.className = 'message';
+                        }, 3000);
+                    } else {
+                        throw new Error(data.error || 'Failed to delete product');
+                    }
+                })
+                .catch(error => {
+                    messageDiv.textContent = 'Error: ' + error.message;
+                    messageDiv.className = 'message error';
+                    
+                    setTimeout(() => {
+                        messageDiv.textContent = '';
+                        messageDiv.className = 'message';
+                    }, 3000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
