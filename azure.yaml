@@ -1,7 +1,0 @@
-# Azure configuration file
-name: product-catalog-app
-services:
-  web:
-    project: .
-    language: python
-    host: appservice 
