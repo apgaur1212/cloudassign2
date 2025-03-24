@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
         
@@ -58,6 +58,11 @@ jobs:
 
       - name: Unzip artifact
         run: unzip release.zip
+
+      - name: 'Install Azure CLI' # Optional step to install Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az --version # Check the version to verify the installation
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
