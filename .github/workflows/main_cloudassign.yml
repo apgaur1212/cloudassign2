@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Python app to Azure Web App - pc45
 
 on:
@@ -10,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read # Required for actions/checkout
 
     steps:
       - name: Checkout repository
@@ -21,16 +24,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Create virtual environment
-        run: python -m venv venv
-
-      - name: Install dependencies
+      - name: Create and activate virtual environment
         run: |
+          python -m venv venv
           source venv/bin/activate
-          pip install -r requirements.txt
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        
+      # Optional: Run tests here (if applicable)
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip . -x "venv/*" ".git/*"
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
@@ -58,6 +63,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'cloudassign'  # Ensure this matches your actual Azure Web App name
+          app-name: 'cloudassign'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
