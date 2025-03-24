@@ -21,14 +21,14 @@ body {
 h1 {
     text-align: center;
     margin-bottom: 30px;
-    color: #da3a47;
+    color: #4a154b;
     font-size: 2.2rem;
     font-weight: 700;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 h2 {
-    color: #da3a47;
+    color: #4a154b;
     margin-bottom: 20px;
     font-weight: 600;
 }
@@ -72,7 +72,7 @@ input[type="number"] {
 
 input[type="text"]:focus,
 input[type="number"]:focus {
-    border-color: #da3a47;
+    border-color: #4a154b;
     outline: none;
     box-shadow: 0 0 0 3px rgba(74, 21, 75, 0.1);
 }
@@ -85,7 +85,7 @@ input[type="file"] {
 }
 
 .btn {
-    background-color: #da3a47;
+    background-color: #4a154b;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -97,16 +97,16 @@ input[type="file"] {
 }
 
 .btn:hover {
-    background-color: #da3a47;
+    background-color: #611f69;
     transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background-color: #da3a47;
+    background-color: #667eea;
 }
 
 .btn-secondary:hover {
-    background-color: #da3a47;
+    background-color: #5a67d8;
 }
 
 .btn-danger {
@@ -159,7 +159,7 @@ th, td {
 }
 
 th {
-    background-color: #da3a47;
+    background-color: #4a154b;
     color: white;
     font-weight: 600;
     text-transform: uppercase;
